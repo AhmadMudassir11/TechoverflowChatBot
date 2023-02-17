@@ -143,7 +143,7 @@ server.listen(PORT, ()=> {
 
 
 async function getResponseFromOpenAi(prompt){
-  let API_KEY = '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'
+  let API_KEY = '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'
   const configuration = new Configuration({
       apiKey: API_KEY
   });
