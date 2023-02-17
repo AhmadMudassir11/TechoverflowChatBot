@@ -92,7 +92,7 @@ io.on('connection', (socket)=> {
     console.log(roomMessagesAI)
     const newMessageAI = await Message.create({content: roomMessagesAI, from: {
       "_id": "62e7c24dbaf7590ce5fcc2d5",
-      "name": "Bilal",
+      "name": "AI Bot",
       "email": "bilal@gmail.com",
       "picture": "http://res.cloudinary.com/dersaxowt/image/upload/v1659355725/xfxoij2tgcf7yopszn0t.png",
       "status": "online",
