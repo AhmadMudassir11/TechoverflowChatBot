@@ -17,12 +17,7 @@ require('./connection')
  
 const server = require('http').createServer(app);
 const PORT = 8000;
-const io = require('socket.io')(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
-})
+const io = require('socket.io')(server)
 
  // Get messages of that room from DB by date(Aggregate is a function in mongo db) 
 async function getLastMessagesFromRoom(room){
