@@ -6,6 +6,7 @@ const {Configuration, OpenAIApi}= require('openai')
 const Message = require('./models/Message')
 const rooms = ['general'];
 const cors = require('cors');
+const config = require('dotenv').config()
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -14,12 +15,12 @@ app.use(cors('*'));
 app.use('/users', userRoutes)
 //Database connection data
 require('./connection')
- 
+
 const server = require('http').createServer(app);
 const PORT = 8000;
 const io = require('socket.io')(server)
 
- // Get messages of that room from DB by date(Aggregate is a function in mongo db) 
+ // Get messages of that room from DB by date(Aggregate is a function in mongo db)
 async function getLastMessagesFromRoom(room){
   let roomMessages = await Message.aggregate([
     {$match: {to: room}},
@@ -28,7 +29,7 @@ async function getLastMessagesFromRoom(room){
   return roomMessages;
 }
 // Date is like this 02/11/2022
-// 20220211  so first we do it by year then month then date 
+// 20220211  so first we do it by year then month then date
 // This function will sort all messages by Date from earliest messages to latest a = earliest / b = latest
 
 function sortRoomMessagesByDate(messages){
@@ -65,7 +66,7 @@ io.on('connection', (socket)=> {
   })
 
 
-  // Things on frontend will happen in MessageForm  
+  // Things on frontend will happen in MessageForm
   socket.on('message-room', async(room, content, sender, time, date) => {
   // console.log('new-messages', content );  We'll receive the message from the user
     const newMessage = await Message.create({content, from: sender, time, date, to: room})
@@ -105,12 +106,12 @@ io.on('connection', (socket)=> {
     // User that are not in the room get notification
     socket.broadcast.emit('notifications', room)
   })
-  
-  //Still using socket 
+
+  //Still using socket
   //Logout will happen in Navigation in Frontend
-  // Once we logout in we can see in featurs/userSlice we return null in frontend 
+  // Once we logout in we can see in featurs/userSlice we return null in frontend
   app.delete('/logout', async(req, res)=> {
-    try {     
+    try {
       const {_id, newMessages} = req.body;
       const user = await User.findById(_id);
       user.status = "offline";
@@ -122,7 +123,7 @@ io.on('connection', (socket)=> {
       socket.broadcast.emit('new-user', members);
       res.status(200).send();
 
-    } 
+    }
     catch (err) {
       console.log(err);
       res.status(400).send()
@@ -139,11 +140,12 @@ app.get('/rooms', (req, res)=> {
 
 server.listen(PORT, ()=> {
   console.log('listening to port', PORT)
+  console.log(process.env.OPENAI_API_KEY)
 })
 
 
 async function getResponseFromOpenAi(prompt){
-  let API_KEY = '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'
+  let API_KEY = process.env.OPENAI_API_KEY
   const configuration = new Configuration({
       apiKey: API_KEY
   });
@@ -160,9 +162,9 @@ async function getResponseFromOpenAi(prompt){
       });
       // Delay for 1 second before sending the response
       // await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
          return response.data.choices[0].text
-    
+
   } catch (e) {
       return "Could not get response"
   }
